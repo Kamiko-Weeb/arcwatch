@@ -1,3 +1,6 @@
+# GDELT cache
+backend/.gdelt_cache/
+
 # Python
 __pycache__/
 *.py[cod]
