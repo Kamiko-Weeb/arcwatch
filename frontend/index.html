@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ArcWatch — Global Conflict Tracker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ── Header ───────────────────────────────────────────────── -->
+  <header id="top-bar">
+    <div id="brand">
+      <div class="brand-icon"></div>
+      <span class="brand-name">ARCWATCH</span>
+    </div>
+
+    <div id="header-stats">
+      <div class="hstat">
+        <span id="stat-active" class="hstat-val red">—</span>
+        <span class="hstat-lbl">ACTIVE</span>
+      </div>
+      <div class="hstat">
+        <span id="stat-tensions" class="hstat-val orange">—</span>
+        <span class="hstat-lbl">TENSIONS</span>
+      </div>
+      <div class="hstat" id="aircraft-hstat" style="display:none">
+        <span id="stat-aircraft" class="hstat-val yellow">—</span>
+        <span class="hstat-lbl">AIRCRAFT</span>
+      </div>
+    </div>
+
+    <div id="live-badge">
+      <span class="live-dot"></span>LIVE <span id="live-viewers">—</span>
+    </div>
+
+    <!-- Filters -->
+    <div id="header-filters">
+      <select id="days-select" class="hdr-select">
+        <option value="1">24H</option>
+        <option value="3" selected>3D</option>
+        <option value="7">7D</option>
+        <option value="14">14D</option>
+        <option value="30">30D</option>
+      </select>
+      <select id="type-select" class="hdr-select">
+        <option value="">ALL TYPES</option>
+        <option value="Battles">BATTLES</option>
+        <option value="Explosions/Remote violence">EXPLOSIONS</option>
+        <option value="Violence against civilians">VIOLENCE</option>
+        <option value="Protests">PROTESTS</option>
+        <option value="Military Activity">MILITARY</option>
+        <option value="Coercion">COERCION</option>
+      </select>
+    </div>
+
+    <div id="header-right">
+      <span id="stat-events">—</span> events &nbsp;·&nbsp; <span id="stat-countries">—</span> countries
+      &nbsp;
+      <button id="export-btn" class="hdr-btn" title="Export current data as CSV">↓ CSV</button>
+      <span id="data-source-badge">GDELT</span>
+    </div>
+  </header>
+
+  <!-- ── Ticker ────────────────────────────────────────────────── -->
+  <div id="ticker-wrap">
+    <div id="ticker-label">LATEST</div>
+    <div id="ticker-track">
+      <div id="ticker-inner"></div>
+    </div>
+  </div>
+
+  <!-- ── Main layout ──────────────────────────────────────────── -->
+  <div id="main">
+
+    <!-- Left: Pulse Feed -->
+    <aside id="feed-panel">
+      <div id="feed-header">
+        <span class="panel-title">PULSE FEED</span>
+        <button id="feed-refresh" title="Refresh">↻</button>
+      </div>
+      <div id="feed-sev-filters">
+        <button class="sev-btn active" data-sev="">ALL</button>
+        <button class="sev-btn" data-sev="HIGH">HIGH</button>
+        <button class="sev-btn" data-sev="MEDIUM">MEDIUM</button>
+        <button class="sev-btn" data-sev="LOW">LOW</button>
+      </div>
+      <div id="feed-search-wrap">
+        <input type="text" id="feed-search" placeholder="Search country, actor…" autocomplete="off" />
+        <div id="country-suggestions"></div>
+      </div>
+      <ul id="feed-list"></ul>
+      <div id="feed-count-bar"><span id="feed-count"></span></div>
+    </aside>
+
+    <!-- Center: Globe -->
+    <div id="globe-wrap">
+      <div id="globe-container"></div>
+
+      <!-- Globe layer / view controls -->
+      <div id="globe-controls">
+        <!-- View mode -->
+        <div class="gc-group" id="view-btns">
+          <button class="view-btn active" data-view="dark">DARK</button>
+          <button class="view-btn" data-view="satellite">SAT</button>
+        </div>
+
+        <div class="gc-divider"></div>
+
+        <!-- Layer toggles -->
+        <label class="gc-toggle"><input type="checkbox" id="tog-conflicts" checked /> Conflicts</label>
+        <label class="gc-toggle"><input type="checkbox" id="tog-aircraft" /> Aircraft</label>
+        <label class="gc-toggle"><input type="checkbox" id="tog-vessels" /> Naval</label>
+        <label class="gc-toggle"><input type="checkbox" id="tog-heat" /> Heatmap</label>
+
+        <div class="gc-divider"></div>
+
+        <label class="gc-toggle"><input type="checkbox" id="tog-rotate" /> Rotate</label>
+      </div>
+
+      <div id="loading-overlay">
+        <div class="spinner"></div>
+        <p id="loading-msg">Loading GDELT data…</p>
+      </div>
+    </div>
+
+    <!-- Right: Intel Panel -->
+    <aside id="intel-panel">
+
+      <div class="intel-section" id="markets-section">
+        <div class="panel-title">MARKETS <span class="panel-sub">live</span></div>
+        <div id="markets-grid"></div>
+      </div>
+
+      <div class="intel-section">
+        <div class="panel-title">TOP KEYWORDS <span class="panel-sub">24H</span></div>
+        <ul id="keyword-list"></ul>
+      </div>
+
+      <div class="intel-section">
+        <div class="panel-title">HOT ZONES</div>
+        <ul id="country-list"></ul>
+      </div>
+
+      <div class="intel-section">
+        <div class="panel-title">BY TYPE</div>
+        <div id="type-breakdown"></div>
+      </div>
+
+      <div class="intel-section" id="vessel-notice">
+        <div class="panel-title">NAVAL ACTIVITY</div>
+        <div class="notice-card">
+          <div class="notice-icon">⚓</div>
+          <div class="notice-text">Enable the Naval layer to show GDELT maritime events.</div>
+        </div>
+      </div>
+
+    </aside>
+  </div>
+
+  <!-- ── Detail overlay ───────────────────────────────────────── -->
+  <div id="detail-overlay" class="hidden">
+    <div id="detail-card">
+      <button id="detail-close">✕</button>
+      <div id="detail-content"></div>
+    </div>
+  </div>
+
+  <!-- ── Error toast ───────────────────────────────────────────── -->
+  <div id="error-toast"></div>
+
+  <script src="globe.gl.min.js"></script>
+  <script src="map.js"></script>
+</body>
+</html>
