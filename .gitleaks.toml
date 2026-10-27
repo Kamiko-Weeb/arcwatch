@@ -1,0 +1,7 @@
+# Old commits contain cached GDELT news data whose URL slugs look like keys.
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Cached public news data, not secrets"
+paths = ['''backend/\.gdelt_cache/''']

@@ -51,10 +51,13 @@ def fetch_events(days=7, event_types=None, limit=5000, country=None):
         resp = requests.get(ACLED_BASE_URL, params=params, timeout=30)
         resp.raise_for_status()
         data = resp.json()
+    # The key and email travel in the query string, so the exception text (which
+    # includes the full URL) must never be passed on. Report only the status.
     except requests.exceptions.HTTPError as e:
-        raise RuntimeError(f"ACLED API HTTP error: {e}")
+        status = e.response.status_code if e.response is not None else 'unknown'
+        raise RuntimeError(f"ACLED API HTTP error (status {status})") from None
     except requests.exceptions.RequestException as e:
-        raise RuntimeError(f"ACLED API request failed: {e}")
+        raise RuntimeError(f"ACLED API request failed ({type(e).__name__})") from None
     except ValueError:
         raise RuntimeError("ACLED API returned invalid JSON")
 
